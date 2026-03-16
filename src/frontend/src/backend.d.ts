@@ -1,0 +1,19 @@
+import type { Principal } from "@icp-sdk/core/principal";
+export interface Some<T> {
+    __kind__: "Some";
+    value: T;
+}
+export interface None {
+    __kind__: "None";
+}
+export type Option<T> = Some<T> | None;
+export interface WaitlistEntry {
+    name: string;
+    email: string;
+}
+export interface backendInterface {
+    getAllEntries(): Promise<Array<WaitlistEntry>>;
+    getWaitlistCount(): Promise<bigint>;
+    isEmailRegistered(email: string): Promise<boolean>;
+    joinWaitlist(name: string, email: string): Promise<void>;
+}

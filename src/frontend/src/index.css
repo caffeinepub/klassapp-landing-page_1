@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* KlassApp Brand Tokens - OKLCH */
+    --background: 98.5 0.005 240;
+    --foreground: 15 0.04 250;
+
+    --card: 100 0 0;
+    --card-foreground: 15 0.04 250;
+
+    --popover: 100 0 0;
+    --popover-foreground: 15 0.04 250;
+
+    /* Primary Blue #1E6FD9 */
+    --primary: 50 0.18 255;
+    --primary-foreground: 100 0 0;
+
+    /* Brand Green #22C55E */
+    --secondary: 72 0.2 145;
+    --secondary-foreground: 100 0 0;
+
+    --muted: 96 0.01 250;
+    --muted-foreground: 50 0.04 250;
+
+    --accent: 92 0.04 250;
+    --accent-foreground: 15 0.04 250;
+
+    --destructive: 50 0.22 27;
+    --destructive-foreground: 100 0 0;
+
+    --border: 90 0.02 250;
+    --input: 90 0.02 250;
+    --ring: 50 0.18 255;
+
+    --radius: 0.75rem;
+
+    /* Chart */
+    --chart-1: 50 0.18 255;
+    --chart-2: 72 0.2 145;
+    --chart-3: 65 0.15 200;
+    --chart-4: 80 0.15 180;
+    --chart-5: 45 0.12 30;
+
+    /* Sidebar */
+    --sidebar: 100 0 0;
+    --sidebar-foreground: 15 0.04 250;
+    --sidebar-primary: 50 0.18 255;
+    --sidebar-primary-foreground: 100 0 0;
+    --sidebar-accent: 96 0.01 250;
+    --sidebar-accent-foreground: 15 0.04 250;
+    --sidebar-border: 90 0.02 250;
+    --sidebar-ring: 50 0.18 255;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.font-display {
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+
+/* Hero gradient background */
+.hero-gradient {
+  background: radial-gradient(
+    ellipse 80% 60% at 60% 40%,
+    #1e3a6e 0%,
+    #0f172a 55%,
+    #0a0f1e 100%
+  );
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Feature card hover */
+.feature-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(30, 111, 217, 0.12);
+}
+
+/* Pricing card highlight */
+.pricing-highlight {
+  box-shadow: 0 0 0 2px #1e6fd9, 0 20px 40px rgba(30, 111, 217, 0.2);
+}
