@@ -89,74 +89,93 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface WaitlistEntry {
-    name: string;
-    email: string;
+export interface OnboardingEntry {
+    schoolSize: string;
+    contactName: string;
+    role: string;
+    contactEmail: string;
+    contactPhone: string;
+    schoolName: string;
 }
+export type Result = {
+    __kind__: "ok";
+    ok: null;
+} | {
+    __kind__: "err";
+    err: string;
+};
 export interface backendInterface {
-    getAllEntries(): Promise<Array<WaitlistEntry>>;
-    getWaitlistCount(): Promise<bigint>;
-    isEmailRegistered(email: string): Promise<boolean>;
-    joinWaitlist(name: string, email: string): Promise<void>;
+    getAllOnboardings(): Promise<Array<OnboardingEntry>>;
+    getOnboardingCount(): Promise<bigint>;
+    submitOnboarding(schoolName: string, schoolSize: string, contactName: string, contactEmail: string, contactPhone: string, role: string): Promise<Result>;
 }
+import type { Result as _Result } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async getAllEntries(): Promise<Array<WaitlistEntry>> {
+    async getAllOnboardings(): Promise<Array<OnboardingEntry>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getAllEntries();
+                const result = await this.actor.getAllOnboardings();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getAllEntries();
+            const result = await this.actor.getAllOnboardings();
             return result;
         }
     }
-    async getWaitlistCount(): Promise<bigint> {
+    async getOnboardingCount(): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.getWaitlistCount();
+                const result = await this.actor.getOnboardingCount();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getWaitlistCount();
+            const result = await this.actor.getOnboardingCount();
             return result;
         }
     }
-    async isEmailRegistered(arg0: string): Promise<boolean> {
+    async submitOnboarding(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string): Promise<Result> {
         if (this.processError) {
             try {
-                const result = await this.actor.isEmailRegistered(arg0);
-                return result;
+                const result = await this.actor.submitOnboarding(arg0, arg1, arg2, arg3, arg4, arg5);
+                return from_candid_Result_n1(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.isEmailRegistered(arg0);
-            return result;
+            const result = await this.actor.submitOnboarding(arg0, arg1, arg2, arg3, arg4, arg5);
+            return from_candid_Result_n1(this._uploadFile, this._downloadFile, result);
         }
     }
-    async joinWaitlist(arg0: string, arg1: string): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.joinWaitlist(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.joinWaitlist(arg0, arg1);
-            return result;
-        }
-    }
+}
+function from_candid_Result_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Result): Result {
+    return from_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function from_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    ok: null;
+} | {
+    err: string;
+}): {
+    __kind__: "ok";
+    ok: null;
+} | {
+    __kind__: "err";
+    err: string;
+} {
+    return "ok" in value ? {
+        __kind__: "ok",
+        ok: value.ok
+    } : "err" in value ? {
+        __kind__: "err",
+        err: value.err
+    } : value;
 }
 export interface CreateActorOptions {
     agent?: Agent;

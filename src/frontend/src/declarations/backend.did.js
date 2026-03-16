@@ -8,28 +8,47 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const WaitlistEntry = IDL.Record({
-  'name' : IDL.Text,
-  'email' : IDL.Text,
+export const OnboardingEntry = IDL.Record({
+  'schoolSize' : IDL.Text,
+  'contactName' : IDL.Text,
+  'role' : IDL.Text,
+  'contactEmail' : IDL.Text,
+  'contactPhone' : IDL.Text,
+  'schoolName' : IDL.Text,
 });
+export const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text });
 
 export const idlService = IDL.Service({
-  'getAllEntries' : IDL.Func([], [IDL.Vec(WaitlistEntry)], ['query']),
-  'getWaitlistCount' : IDL.Func([], [IDL.Nat], ['query']),
-  'isEmailRegistered' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
-  'joinWaitlist' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'getAllOnboardings' : IDL.Func([], [IDL.Vec(OnboardingEntry)], ['query']),
+  'getOnboardingCount' : IDL.Func([], [IDL.Nat], ['query']),
+  'submitOnboarding' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [Result],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  const WaitlistEntry = IDL.Record({ 'name' : IDL.Text, 'email' : IDL.Text });
+  const OnboardingEntry = IDL.Record({
+    'schoolSize' : IDL.Text,
+    'contactName' : IDL.Text,
+    'role' : IDL.Text,
+    'contactEmail' : IDL.Text,
+    'contactPhone' : IDL.Text,
+    'schoolName' : IDL.Text,
+  });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text });
   
   return IDL.Service({
-    'getAllEntries' : IDL.Func([], [IDL.Vec(WaitlistEntry)], ['query']),
-    'getWaitlistCount' : IDL.Func([], [IDL.Nat], ['query']),
-    'isEmailRegistered' : IDL.Func([IDL.Text], [IDL.Bool], ['query']),
-    'joinWaitlist' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'getAllOnboardings' : IDL.Func([], [IDL.Vec(OnboardingEntry)], ['query']),
+    'getOnboardingCount' : IDL.Func([], [IDL.Nat], ['query']),
+    'submitOnboarding' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [Result],
+        [],
+      ),
   });
 };
 

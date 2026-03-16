@@ -1,29 +1,52 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useActor } from "./useActor";
 
-export function useWaitlistCount() {
+export function useOnboardingCount() {
   const { actor, isFetching } = useActor();
   return useQuery<bigint>({
-    queryKey: ["waitlistCount"],
+    queryKey: ["onboardingCount"],
     queryFn: async () => {
       if (!actor) return BigInt(0);
-      return actor.getWaitlistCount();
+      return actor.getOnboardingCount();
     },
     enabled: !!actor && !isFetching,
     refetchInterval: 30000,
   });
 }
 
-export function useJoinWaitlist() {
+export function useSubmitOnboarding() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ name, email }: { name: string; email: string }) => {
+    mutationFn: async ({
+      schoolName,
+      schoolSize,
+      contactName,
+      contactEmail,
+      contactPhone,
+      role,
+    }: {
+      schoolName: string;
+      schoolSize: string;
+      contactName: string;
+      contactEmail: string;
+      contactPhone: string;
+      role: string;
+    }) => {
       if (!actor) throw new Error("Not connected");
-      return actor.joinWaitlist(name, email);
+      const result = await actor.submitOnboarding(
+        schoolName,
+        schoolSize,
+        contactName,
+        contactEmail,
+        contactPhone,
+        role,
+      );
+      if (result.__kind__ === "err") throw new Error(result.err);
+      return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["waitlistCount"] });
+      queryClient.invalidateQueries({ queryKey: ["onboardingCount"] });
     },
   });
 }

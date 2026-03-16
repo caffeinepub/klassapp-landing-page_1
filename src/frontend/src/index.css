@@ -81,35 +81,7 @@
 
 /* ── Hero ── */
 .hero-gradient {
-  background: radial-gradient(
-    ellipse 80% 60% at 60% 40%,
-    #1e3a6e 0%,
-    #0f172a 55%,
-    #0a0f1e 100%
-  );
-}
-
-/* Subtle dot grid overlay on hero */
-.hero-grid-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.06) 1px,
-    transparent 1px
-  );
-  background-size: 32px 32px;
-  mask-image: radial-gradient(
-    ellipse 80% 70% at 60% 50%,
-    black 0%,
-    transparent 80%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 80% 70% at 60% 50%,
-    black 0%,
-    transparent 80%
-  );
+  background: linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
 }
 
 /* Hero headline shimmer */
@@ -252,4 +224,35 @@
     black 0%,
     transparent 100%
   );
+}
+
+/* Hero animated phrase colors */
+.hero-phrase-blue {
+  background: linear-gradient(90deg, #60a5fa, #93c5fd 60%, #60a5fa);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 5s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.45));
+}
+
+.hero-phrase-green {
+  background: linear-gradient(90deg, #22c55e, #86efac 60%, #22c55e);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 5s linear infinite 0.4s;
+  filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.4));
+}
+
+.hero-phrase-gold {
+  background: linear-gradient(90deg, #f59e0b, #fcd34d 60%, #f59e0b);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 5s linear infinite 0.8s;
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
 }

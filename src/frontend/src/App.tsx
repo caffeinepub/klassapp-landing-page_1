@@ -1,16 +1,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
-import { useJoinWaitlist, useWaitlistCount } from "@/hooks/useQueries";
+import { useOnboardingCount, useSubmitOnboarding } from "@/hooks/useQueries";
 import {
   ArrowRight,
   BarChart3,
   Building2,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
   Clock,
   CreditCard,
+  Download,
   FileText,
   Home,
   Loader2,
@@ -21,7 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, type Variants, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 const fadeUp: Variants = {
@@ -121,34 +130,35 @@ const TESTIMONIALS = [
 
 const PRICING = [
   {
-    name: "Free",
-    price: "$0",
+    name: "Basic",
+    price: "$30",
     period: "/mo",
-    desc: "Perfect for small schools getting started.",
+    desc: "For small to medium schools ready to modernize.",
     features: [
-      "Up to 50 students",
-      "Basic attendance tracking",
-      "Grade book",
+      "Up to 300 students",
+      "Attendance & scheduling",
+      "Grade book & reports",
+      "Parent portal",
       "Email support",
     ],
-    cta: "Start Free",
+    cta: "Get Started",
     highlight: false,
     popular: false,
   },
   {
     name: "Pro",
-    price: "$29",
+    price: "$40",
     period: "/mo",
-    desc: "Everything your growing school needs.",
+    desc: "Everything growing institutions need to thrive.",
     features: [
-      "Up to 500 students",
-      "All Free features",
-      "Parent portal",
-      "Fee management",
-      "Advanced analytics",
+      "Up to 1,000 students",
+      "All Basic features",
+      "Fee management & payments",
+      "Advanced analytics & insights",
+      "Staff communication tools",
       "Priority support",
     ],
-    cta: "Get Started",
+    cta: "Onboard Your School",
     highlight: true,
     popular: true,
   },
@@ -156,14 +166,14 @@ const PRICING = [
     name: "Enterprise",
     price: "Custom",
     period: "",
-    desc: "Tailored solutions for large institutions.",
+    desc: "Tailored solutions for large institutions & districts.",
     features: [
       "Unlimited students",
       "All Pro features",
-      "Custom integrations",
+      "Custom integrations & API",
       "Dedicated account manager",
       "SLA & compliance support",
-      "On-premise option",
+      "On-premise deployment option",
     ],
     cta: "Contact Sales",
     highlight: false,
@@ -190,7 +200,7 @@ const FOOTER_LINKS = {
     { label: "About Us", href: "#top" },
     { label: "Blog", href: "#top" },
     { label: "Careers", href: "#top" },
-    { label: "Contact", href: "#waitlist" },
+    { label: "Contact", href: "#onboarding" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "#top" },
@@ -202,6 +212,22 @@ const FOOTER_LINKS = {
 
 /* ─── Coded Dashboard Mockup Component ─── */
 function DashboardMockup() {
+  const mockupRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!mockupRef.current) return;
+    const html2canvas = (await import("html2canvas")).default;
+    const canvas = await html2canvas(mockupRef.current, {
+      backgroundColor: "#0d1b35",
+      scale: 2,
+      useCORS: true,
+    });
+    const link = document.createElement("a");
+    link.download = "klassapp-dashboard.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
   const students = [
     { name: "Ava Thompson", class: "Grade 8A", status: "Present", fee: "Paid" },
     {
@@ -215,7 +241,8 @@ function DashboardMockup() {
 
   return (
     <div
-      className="dashboard-mockup w-full max-w-[580px] rounded-2xl overflow-hidden"
+      ref={mockupRef}
+      className="dashboard-mockup w-full max-w-[580px] rounded-2xl overflow-hidden relative"
       style={{
         background: "#0d1b35",
         border: "1px solid rgba(255,255,255,0.08)",
@@ -416,100 +443,197 @@ function DashboardMockup() {
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        data-ocid="hero.dashboard.button"
+        onClick={handleDownload}
+        title="Download dashboard as PNG"
+        className="absolute bottom-3 right-3 flex items-center justify-center rounded-lg w-8 h-8 transition-all duration-200 hover:scale-110 active:scale-95"
+        style={{
+          background: "rgba(30,111,217,0.85)",
+          border: "1px solid rgba(30,111,217,0.5)",
+          backdropFilter: "blur(4px)",
+          color: "#fff",
+          cursor: "pointer",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "rgba(30,111,217,1)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "rgba(30,111,217,0.85)";
+        }}
+      >
+        <Download className="h-4 w-4" />
+      </button>
     </div>
   );
 }
 
 export default function App() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "" });
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeAudienceTab, setActiveAudienceTab] = useState<
+    "Administrators" | "Teachers"
+  >("Administrators");
+  const [form, setForm] = useState({
+    schoolName: "",
+    schoolSize: "",
+    contactName: "",
+    contactEmail: "",
+    contactPhone: "",
+    role: "",
+  });
   const [submitted, setSubmitted] = useState(false);
-  const waitlistRef = useRef<HTMLElement>(null);
+  const onboardingRef = useRef<HTMLElement>(null);
 
-  const { data: waitlistCount } = useWaitlistCount();
-  const joinWaitlist = useJoinWaitlist();
+  const { data: onboardingCount } = useOnboardingCount();
+  const submitOnboarding = useSubmitOnboarding();
 
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
-
-  const scrollToWaitlist = () => {
-    waitlistRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToOnboarding = () => {
+    onboardingRef.current?.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim()) {
-      toast.error("Please fill in your name and email.");
+    if (
+      !form.schoolName.trim() ||
+      !form.schoolSize.trim() ||
+      !form.contactName.trim() ||
+      !form.contactEmail.trim() ||
+      !form.role.trim()
+    ) {
+      toast.error("Please fill in all required fields.");
       return;
     }
     try {
-      await joinWaitlist.mutateAsync({ name: form.name, email: form.email });
+      await submitOnboarding.mutateAsync({
+        schoolName: form.schoolName,
+        schoolSize: form.schoolSize,
+        contactName: form.contactName,
+        contactEmail: form.contactEmail,
+        contactPhone: form.contactPhone,
+        role: form.role,
+      });
       setSubmitted(true);
-      toast.success("You're on the list! We'll be in touch soon.");
+      toast.success("Your school has been submitted for onboarding!");
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
   };
 
-  const count = waitlistCount ? Number(waitlistCount) : 500;
+  const count = onboardingCount ? Number(onboardingCount) : 500;
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-right" />
 
       {/* ── Navbar ── */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-transparent"
-        }`}
-      >
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-brand-navy shadow-sm">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16 overflow-visible">
           <a href="/" data-ocid="nav.link">
             <img
               src="/assets/uploads/klassapp-logo-primary-1.png"
               alt="KlassApp"
-              className="h-8 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </a>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-7">
             {[
               { label: "Features", href: "#features" },
               { label: "How It Works", href: "#how-it-works" },
-              { label: "Pricing", href: "#pricing" },
             ].map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 data-ocid="nav.link"
-                className={`text-sm font-semibold transition-colors ${
-                  scrolled
-                    ? "text-slate-700 hover:text-brand-blue"
-                    : "text-white hover:text-white/70"
-                }`}
+                className="text-sm font-semibold transition-colors text-white/90 hover:text-white"
               >
                 {item.label}
               </a>
             ))}
+            {/* Dropdown nav items */}
+            {[
+              {
+                label: "Product",
+                items: [
+                  { label: "Dashboard", href: "#features" },
+                  { label: "Attendance", href: "#features" },
+                  { label: "Grades", href: "#features" },
+                  { label: "Communication", href: "#features" },
+                  { label: "Reports", href: "#features" },
+                ],
+              },
+              {
+                label: "Company",
+                items: [
+                  { label: "About Us", href: "#top" },
+                  { label: "Our Mission", href: "#top" },
+                  { label: "Careers", href: "#top" },
+                  { label: "Press", href: "#top" },
+                ],
+              },
+              {
+                label: "Legal",
+                items: [
+                  { label: "Privacy Policy", href: "#top" },
+                  { label: "Terms of Service", href: "#top" },
+                  { label: "Cookie Policy", href: "#top" },
+                ],
+              },
+            ].map((dropdown) => (
+              <div
+                key={dropdown.label}
+                className="relative"
+                onMouseEnter={() => setActiveDropdown(dropdown.label)}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-sm font-semibold text-white/90 hover:text-white cursor-pointer transition-colors"
+                >
+                  {dropdown.label}
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </button>
+                {activeDropdown === dropdown.label && (
+                  <div
+                    data-ocid="nav.dropdown_menu"
+                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-2 z-50"
+                  >
+                    {dropdown.items.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        data-ocid="nav.link"
+                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-brand-blue transition-colors"
+                      >
+                        {item.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <a
+              href="#pricing"
+              data-ocid="nav.link"
+              className="text-sm font-semibold transition-colors text-white/90 hover:text-white"
+            >
+              Pricing
+            </a>
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
             <Button
-              onClick={scrollToWaitlist}
+              onClick={scrollToOnboarding}
               data-ocid="nav.primary_button"
-              className={`font-semibold px-5 rounded-full transition-all ${
-                scrolled
-                  ? "bg-brand-blue hover:bg-blue-700 text-white"
-                  : "bg-white hover:bg-white/90 text-brand-navy shadow-md"
-              }`}
+              className="font-semibold px-5 rounded-full transition-all bg-brand-blue hover:bg-blue-700 text-white"
             >
-              Get Early Access
+              Onboard Your School
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
@@ -517,9 +641,7 @@ export default function App() {
           {/* Mobile Menu Toggle */}
           <button
             type="button"
-            className={`md:hidden p-2 rounded-lg ${
-              scrolled ? "text-slate-700" : "text-white"
-            }`}
+            className="md:hidden p-2 rounded-lg text-white"
             onClick={() => setMobileOpen(!mobileOpen)}
             data-ocid="nav.toggle"
             aria-label="Toggle menu"
@@ -539,7 +661,7 @@ export default function App() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="md:hidden bg-white border-t border-slate-100 shadow-lg"
+              className="md:hidden bg-brand-navy border-t border-white/10 shadow-lg"
             >
               <div className="container px-4 py-4 flex flex-col gap-3">
                 {[
@@ -552,17 +674,17 @@ export default function App() {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     data-ocid="nav.link"
-                    className="text-sm font-medium text-slate-700 hover:text-brand-blue py-2"
+                    className="text-sm font-medium text-white/90 hover:text-white py-2"
                   >
                     {item.label}
                   </a>
                 ))}
                 <Button
-                  onClick={scrollToWaitlist}
+                  onClick={scrollToOnboarding}
                   data-ocid="nav.primary_button"
                   className="bg-brand-blue text-white font-semibold rounded-full w-full mt-1"
                 >
-                  Get Early Access
+                  Onboard Your School
                 </Button>
               </div>
             </motion.div>
@@ -572,8 +694,6 @@ export default function App() {
 
       {/* ── Hero ── */}
       <section className="hero-gradient min-h-screen flex items-center pt-16 pb-24 overflow-hidden relative">
-        {/* Subtle grid overlay */}
-        <div className="hero-grid-overlay" />
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
@@ -586,39 +706,97 @@ export default function App() {
               <motion.div variants={fadeUp}>
                 <Badge className="mb-6 inline-flex items-center gap-1.5 bg-brand-green/15 text-brand-green border-brand-green/30 px-3 py-1 text-xs font-semibold rounded-full">
                   <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse" />
-                  Now in Beta — Join the Waitlist
+                  KlassApp is Live — Onboard Your School Today
                 </Badge>
               </motion.div>
 
               <motion.h1
                 variants={fadeUp}
-                className="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6"
+                className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6"
               >
-                Smarter <span className="hero-shimmer-text">School</span>
-                <br />
-                Management.
+                Built for Schools.{" "}
+                <span className="text-brand-blue">Powered by Tomorrow.</span>
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
-                className="text-slate-300 text-lg sm:text-xl leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0"
+                className="text-white/70 text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0"
               >
-                KlassApp brings together students, teachers, and administrators
-                in one beautifully simple platform — designed for the modern
-                school.
+                KlassApp unifies your entire school ecosystem — students,
+                teachers, parents, and administrators — into one intelligent,
+                future-ready platform that transforms how modern schools
+                connect, operate, and thrive. Powered by cutting-edge AI
+                automation and blockchain-grade security, KlassApp delivers
+                real-time communication, unbreakable data privacy, and infinite
+                scalability, so your school doesn't just keep up with the
+                future, it leads it.
               </motion.p>
+
+              {/* Audience Tabs */}
+              <motion.div variants={fadeUp} className="mb-6">
+                <div className="flex gap-2 mb-4">
+                  {(["Administrators", "Teachers"] as const).map((tab, idx) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      data-ocid={`hero.tab.${idx + 1}`}
+                      onClick={() => setActiveAudienceTab(tab)}
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                        activeAudienceTab === tab
+                          ? "bg-brand-blue text-white shadow-blue"
+                          : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeAudienceTab}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-white/5 border border-white/10 rounded-2xl p-5"
+                  >
+                    {activeAudienceTab === "Administrators" ? (
+                      <>
+                        <p className="text-white font-bold text-lg mb-1">
+                          Stop managing chaos. Start leading with clarity.
+                        </p>
+                        <p className="text-white/70 text-sm">
+                          One platform to run your entire school, smarter,
+                          faster, and more securely than ever before.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-white font-bold text-lg mb-1">
+                          Spend less time on admin. More time doing what you
+                          love — teaching.
+                        </p>
+                        <p className="text-white/70 text-sm">
+                          KlassApp handles the noise so you can focus on what
+                          actually matters.
+                        </p>
+                      </>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </motion.div>
 
               <motion.div
                 variants={fadeUp}
                 className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8"
               >
                 <Button
-                  onClick={scrollToWaitlist}
+                  onClick={scrollToOnboarding}
                   data-ocid="hero.primary_button"
                   size="lg"
                   className="bg-brand-blue hover:bg-blue-600 text-white font-semibold px-8 py-6 rounded-full text-base shadow-blue"
                 >
-                  Get Early Access
+                  Onboard Your School Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button
@@ -626,7 +804,7 @@ export default function App() {
                   variant="outline"
                   size="lg"
                   data-ocid="hero.secondary_button"
-                  className="border-white/30 text-white bg-white/5 hover:bg-white/10 font-semibold px-8 py-6 rounded-full text-base backdrop-blur-sm"
+                  className="border-white/30 text-white bg-white/10 hover:bg-white/20 font-semibold px-8 py-6 rounded-full text-base backdrop-blur-sm"
                 >
                   <a href="#features">See Features</a>
                 </Button>
@@ -634,7 +812,7 @@ export default function App() {
 
               <motion.div
                 variants={fadeUp}
-                className="flex items-center gap-2 justify-center lg:justify-start text-sm text-slate-400"
+                className="flex items-center gap-2 justify-center lg:justify-start text-sm text-white/60"
               >
                 <CheckCircle2 className="h-4 w-4 text-brand-green flex-shrink-0" />
                 <span>
@@ -1012,7 +1190,7 @@ export default function App() {
                   ))}
                 </ul>
                 <Button
-                  onClick={scrollToWaitlist}
+                  onClick={scrollToOnboarding}
                   data-ocid={`pricing.primary_button.${i + 1}`}
                   className={`w-full rounded-full font-semibold ${
                     plan.highlight
@@ -1028,10 +1206,10 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Waitlist CTA ── */}
+      {/* ── School Onboarding CTA ── */}
       <section
-        ref={waitlistRef as React.RefObject<HTMLElement>}
-        id="waitlist"
+        ref={onboardingRef as React.RefObject<HTMLElement>}
+        id="onboarding"
         className="waitlist-section py-24 relative overflow-hidden"
       >
         {/* Grid texture overlay */}
@@ -1046,7 +1224,7 @@ export default function App() {
             <motion.div variants={fadeUp}>
               <Badge className="mb-6 inline-flex items-center gap-1.5 bg-brand-green/15 text-brand-green border-brand-green/30 px-3 py-1 text-xs font-semibold rounded-full">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-green animate-pulse" />
-                {count}+ schools joined
+                {count}+ schools onboarded
               </Badge>
             </motion.div>
 
@@ -1054,14 +1232,14 @@ export default function App() {
               variants={fadeUp}
               className="font-display text-4xl sm:text-5xl font-bold text-white mb-4"
             >
-              Be the first to transform your school.
+              Ready to transform your school?
             </motion.h2>
             <motion.p
               variants={fadeUp}
               className="text-slate-400 text-lg mb-10"
             >
-              Join the waitlist today and get early access, exclusive onboarding
-              support, and 3 months free on any paid plan.
+              Fill in your details and our team will get you set up within 24
+              hours.
             </motion.p>
 
             <AnimatePresence mode="wait">
@@ -1070,90 +1248,223 @@ export default function App() {
                   key="success"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  data-ocid="waitlist.success_state"
+                  data-ocid="onboarding.success_state"
                   className="glass-card rounded-2xl p-10 flex flex-col items-center gap-4"
                 >
                   <div className="h-16 w-16 rounded-full bg-brand-green/20 flex items-center justify-center">
                     <CheckCircle2 className="h-8 w-8 text-brand-green" />
                   </div>
                   <h3 className="font-display text-2xl font-bold text-white">
-                    You&apos;re on the list!
+                    You&apos;re all set!
                   </h3>
                   <p className="text-slate-400 text-sm max-w-xs">
-                    We&apos;ll reach out as soon as early access opens. Keep an
-                    eye on your inbox.
+                    Our team will reach out within 24 hours to get your school
+                    onboarded.
                   </p>
                 </motion.div>
               ) : (
                 <motion.form
                   key="form"
                   onSubmit={handleSubmit}
-                  data-ocid="waitlist.panel"
-                  className="glass-card rounded-2xl p-8"
+                  data-ocid="onboarding.panel"
+                  className="glass-card rounded-2xl p-8 text-left"
                 >
+                  {/* Row 1: School Name + School Size */}
                   <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                    <div className="text-left">
+                    <div>
                       <label
-                        htmlFor="waitlist-name"
+                        htmlFor="school-name"
                         className="block text-xs font-medium text-slate-400 mb-1.5"
                       >
-                        Full Name
+                        School Name
                       </label>
                       <Input
-                        id="waitlist-name"
-                        placeholder="Jane Smith"
-                        value={form.name}
+                        id="school-name"
+                        placeholder="e.g. Greenfield Academy"
+                        value={form.schoolName}
                         onChange={(e) =>
-                          setForm((p) => ({ ...p, name: e.target.value }))
+                          setForm((p) => ({ ...p, schoolName: e.target.value }))
                         }
-                        data-ocid="waitlist.input"
+                        data-ocid="onboarding.school_name.input"
+                        className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand-blue rounded-xl h-12"
+                        autoComplete="organization"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="school-size"
+                        className="block text-xs font-medium text-slate-400 mb-1.5"
+                      >
+                        School Size
+                      </label>
+                      <Select
+                        value={form.schoolSize}
+                        onValueChange={(v) =>
+                          setForm((p) => ({ ...p, schoolSize: v }))
+                        }
+                      >
+                        <SelectTrigger
+                          id="school-size"
+                          data-ocid="onboarding.school_size.select"
+                          className="bg-white/10 border-white/20 text-white rounded-xl h-12 focus:border-brand-blue"
+                        >
+                          <SelectValue placeholder="Select school size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Under 100 students">
+                            Under 100 students
+                          </SelectItem>
+                          <SelectItem value="100–500 students">
+                            100–500 students
+                          </SelectItem>
+                          <SelectItem value="500–1,000 students">
+                            500–1,000 students
+                          </SelectItem>
+                          <SelectItem value="1,000+ students">
+                            1,000+ students
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Contact Name + Role */}
+                  <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label
+                        htmlFor="contact-name"
+                        className="block text-xs font-medium text-slate-400 mb-1.5"
+                      >
+                        Contact Name
+                      </label>
+                      <Input
+                        id="contact-name"
+                        placeholder="e.g. Dr. Jane Smith"
+                        value={form.contactName}
+                        onChange={(e) =>
+                          setForm((p) => ({
+                            ...p,
+                            contactName: e.target.value,
+                          }))
+                        }
+                        data-ocid="onboarding.contact_name.input"
                         className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand-blue rounded-xl h-12"
                         autoComplete="name"
                         required
                       />
                     </div>
-                    <div className="text-left">
+                    <div>
                       <label
-                        htmlFor="waitlist-email"
+                        htmlFor="role"
+                        className="block text-xs font-medium text-slate-400 mb-1.5"
+                      >
+                        Role / Title
+                      </label>
+                      <Select
+                        value={form.role}
+                        onValueChange={(v) =>
+                          setForm((p) => ({ ...p, role: v }))
+                        }
+                      >
+                        <SelectTrigger
+                          id="role"
+                          data-ocid="onboarding.role.select"
+                          className="bg-white/10 border-white/20 text-white rounded-xl h-12 focus:border-brand-blue"
+                        >
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Principal">Principal</SelectItem>
+                          <SelectItem value="Vice Principal">
+                            Vice Principal
+                          </SelectItem>
+                          <SelectItem value="Administrator">
+                            Administrator
+                          </SelectItem>
+                          <SelectItem value="IT Director">
+                            IT Director
+                          </SelectItem>
+                          <SelectItem value="Finance Director">
+                            Finance Director
+                          </SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Work Email + Phone */}
+                  <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label
+                        htmlFor="contact-email"
                         className="block text-xs font-medium text-slate-400 mb-1.5"
                       >
                         Work Email
                       </label>
                       <Input
-                        id="waitlist-email"
+                        id="contact-email"
                         type="email"
                         placeholder="jane@school.edu"
-                        value={form.email}
+                        value={form.contactEmail}
                         onChange={(e) =>
-                          setForm((p) => ({ ...p, email: e.target.value }))
+                          setForm((p) => ({
+                            ...p,
+                            contactEmail: e.target.value,
+                          }))
                         }
-                        data-ocid="waitlist.input"
+                        data-ocid="onboarding.email.input"
                         className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand-blue rounded-xl h-12"
                         autoComplete="email"
                         required
                       />
                     </div>
+                    <div>
+                      <label
+                        htmlFor="contact-phone"
+                        className="block text-xs font-medium text-slate-400 mb-1.5"
+                      >
+                        Phone (optional)
+                      </label>
+                      <Input
+                        id="contact-phone"
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={form.contactPhone}
+                        onChange={(e) =>
+                          setForm((p) => ({
+                            ...p,
+                            contactPhone: e.target.value,
+                          }))
+                        }
+                        data-ocid="onboarding.phone.input"
+                        className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand-blue rounded-xl h-12"
+                        autoComplete="tel"
+                      />
+                    </div>
                   </div>
+
                   <Button
                     type="submit"
-                    disabled={joinWaitlist.isPending}
-                    data-ocid="waitlist.submit_button"
+                    disabled={submitOnboarding.isPending}
+                    data-ocid="onboarding.submit_button"
                     className="w-full bg-brand-blue hover:bg-blue-600 text-white font-semibold rounded-full py-6 text-base shadow-blue"
                   >
-                    {joinWaitlist.isPending ? (
+                    {submitOnboarding.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Joining…
+                        Submitting…
                       </>
                     ) : (
                       <>
-                        Join the Waitlist
+                        Onboard Your School Now
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
                   </Button>
-                  <p className="text-slate-500 text-xs mt-4">
-                    No spam. Unsubscribe anytime. Your data is safe with us.
+                  <p className="text-slate-500 text-xs mt-4 text-center">
+                    No spam. Your data is safe with us.
                   </p>
                 </motion.form>
               )}
@@ -1170,7 +1481,7 @@ export default function App() {
               <img
                 src="/assets/uploads/klassapp-logo-primary-1.png"
                 alt="KlassApp"
-                className="h-8 w-auto object-contain mb-4"
+                className="h-12 w-auto object-contain mb-4"
               />
               <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
                 The modern school management platform that brings your whole

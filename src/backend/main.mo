@@ -1,48 +1,51 @@
-import Map "mo:core/Map";
-import Array "mo:core/Array";
-import Text "mo:core/Text";
-import Order "mo:core/Order";
-import Runtime "mo:core/Runtime";
+import List "mo:core/List";
+import Nat "mo:core/Nat";
+
+
 
 actor {
-  type WaitlistEntry = {
-    name : Text;
-    email : Text;
+  public type Result = {
+    #ok;
+    #err : Text;
   };
 
-  module WaitlistEntry {
-    public func compare(a : WaitlistEntry, b : WaitlistEntry) : Order.Order {
-      switch (Text.compare(a.email, b.email)) {
-        case (#equal) { Text.compare(a.name, b.name) };
-        case (order) { order };
-      };
+  public type OnboardingEntry = {
+    schoolName : Text;
+    schoolSize : Text;
+    contactName : Text;
+    contactEmail : Text;
+    contactPhone : Text;
+    role : Text;
+  };
+
+  let onboardingEntries = List.empty<OnboardingEntry>();
+
+  public shared ({ caller }) func submitOnboarding(
+    schoolName : Text,
+    schoolSize : Text,
+    contactName : Text,
+    contactEmail : Text,
+    contactPhone : Text,
+    role : Text,
+  ) : async Result {
+    let entry : OnboardingEntry = {
+      schoolName;
+      schoolSize;
+      contactName;
+      contactEmail;
+      contactPhone;
+      role;
     };
+
+    onboardingEntries.add(entry);
+    #ok;
   };
 
-  let entries = Map.empty<Text, WaitlistEntry>();
-
-  public shared ({ caller }) func joinWaitlist(name : Text, email : Text) : async () {
-    if (entries.containsKey(email)) {
-      Runtime.trap("Email already registered!");
-    };
-
-    let entry : WaitlistEntry = {
-      name;
-      email;
-    };
-
-    entries.add(email, entry);
+  public query ({ caller }) func getOnboardingCount() : async Nat {
+    onboardingEntries.size();
   };
 
-  public query ({ caller }) func isEmailRegistered(email : Text) : async Bool {
-    entries.containsKey(email);
-  };
-
-  public query ({ caller }) func getWaitlistCount() : async Nat {
-    entries.size();
-  };
-
-  public query ({ caller }) func getAllEntries() : async [WaitlistEntry] {
-    entries.values().toArray().sort();
+  public query ({ caller }) func getAllOnboardings() : async [OnboardingEntry] {
+    onboardingEntries.toArray();
   };
 };

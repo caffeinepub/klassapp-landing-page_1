@@ -10,12 +10,23 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface WaitlistEntry { 'name' : string, 'email' : string }
+export interface OnboardingEntry {
+  'schoolSize' : string,
+  'contactName' : string,
+  'role' : string,
+  'contactEmail' : string,
+  'contactPhone' : string,
+  'schoolName' : string,
+}
+export type Result = { 'ok' : null } |
+  { 'err' : string };
 export interface _SERVICE {
-  'getAllEntries' : ActorMethod<[], Array<WaitlistEntry>>,
-  'getWaitlistCount' : ActorMethod<[], bigint>,
-  'isEmailRegistered' : ActorMethod<[string], boolean>,
-  'joinWaitlist' : ActorMethod<[string, string], undefined>,
+  'getAllOnboardings' : ActorMethod<[], Array<OnboardingEntry>>,
+  'getOnboardingCount' : ActorMethod<[], bigint>,
+  'submitOnboarding' : ActorMethod<
+    [string, string, string, string, string, string],
+    Result
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
