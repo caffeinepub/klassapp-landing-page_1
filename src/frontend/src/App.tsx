@@ -6,6 +6,7 @@ import { useJoinWaitlist, useWaitlistCount } from "@/hooks/useQueries";
 import {
   ArrowRight,
   BarChart3,
+  Building2,
   CheckCircle2,
   ChevronRight,
   Clock,
@@ -15,6 +16,7 @@ import {
   Loader2,
   Menu,
   Star,
+  TrendingUp,
   Users,
   X,
 } from "lucide-react";
@@ -94,6 +96,8 @@ const TESTIMONIALS = [
     name: "Dr. Amara Osei",
     role: "Principal, Greenfield Academy",
     stars: 5,
+    initials: "AO",
+    color: "from-blue-500 to-indigo-600",
   },
   {
     quote:
@@ -101,6 +105,8 @@ const TESTIMONIALS = [
     name: "James Whitfield",
     role: "Head of Administration, Maplewood High",
     stars: 5,
+    initials: "JW",
+    color: "from-indigo-500 to-purple-600",
   },
   {
     quote:
@@ -108,6 +114,8 @@ const TESTIMONIALS = [
     name: "Priya Sharma",
     role: "Finance Director, Riverside Primary",
     stars: 5,
+    initials: "PS",
+    color: "from-teal-500 to-emerald-600",
   },
 ];
 
@@ -192,6 +200,226 @@ const FOOTER_LINKS = {
   ],
 };
 
+/* ─── Coded Dashboard Mockup Component ─── */
+function DashboardMockup() {
+  const students = [
+    { name: "Ava Thompson", class: "Grade 8A", status: "Present", fee: "Paid" },
+    {
+      name: "Kofi Mensah",
+      class: "Grade 7B",
+      status: "Absent",
+      fee: "Pending",
+    },
+    { name: "Sofia Rivera", class: "Grade 9C", status: "Present", fee: "Paid" },
+  ];
+
+  return (
+    <div
+      className="dashboard-mockup w-full max-w-[580px] rounded-2xl overflow-hidden"
+      style={{
+        background: "#0d1b35",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      {/* Top bar */}
+      <div
+        className="flex items-center justify-between px-5 py-3.5"
+        style={{
+          background: "#0a1628",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+        }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
+          <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
+          <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
+        </div>
+        <span
+          className="text-xs font-semibold tracking-wide"
+          style={{ color: "rgba(255,255,255,0.5)" }}
+        >
+          KlassApp Dashboard
+        </span>
+        <div
+          className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold"
+          style={{ background: "#1E6FD9", color: "#fff" }}
+        >
+          A
+        </div>
+      </div>
+
+      <div className="p-5">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <div
+            className="rounded-xl p-3.5"
+            style={{
+              background: "rgba(30,111,217,0.15)",
+              border: "1px solid rgba(30,111,217,0.25)",
+            }}
+          >
+            <p
+              className="text-xs mb-1"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
+              Total Students
+            </p>
+            <p className="text-2xl font-extrabold" style={{ color: "#fff" }}>
+              1,248
+            </p>
+            <div className="flex items-center gap-1 mt-1">
+              <TrendingUp className="h-3 w-3" style={{ color: "#22C55E" }} />
+              <span className="text-xs" style={{ color: "#22C55E" }}>
+                +4.2%
+              </span>
+            </div>
+          </div>
+          <div
+            className="rounded-xl p-3.5"
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              border: "1px solid rgba(34,197,94,0.25)",
+            }}
+          >
+            <p
+              className="text-xs mb-1"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
+              Today's Attendance
+            </p>
+            <p className="text-2xl font-extrabold" style={{ color: "#22C55E" }}>
+              94%
+            </p>
+            <div
+              className="mt-1.5 rounded-full h-1.5 w-full"
+              style={{ background: "rgba(255,255,255,0.1)" }}
+            >
+              <div
+                className="h-1.5 rounded-full"
+                style={{ width: "94%", background: "#22C55E" }}
+              />
+            </div>
+          </div>
+          <div
+            className="rounded-xl p-3.5"
+            style={{
+              background: "rgba(251,191,36,0.1)",
+              border: "1px solid rgba(251,191,36,0.2)",
+            }}
+          >
+            <p
+              className="text-xs mb-1"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
+              Pending Fees
+            </p>
+            <p className="text-2xl font-extrabold" style={{ color: "#FBBF24" }}>
+              12
+            </p>
+            <p
+              className="text-xs mt-1"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
+              ₦48,000 due
+            </p>
+          </div>
+        </div>
+
+        {/* Mini Table */}
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          <div
+            className="px-4 py-2.5 flex items-center justify-between"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <span
+              className="text-xs font-semibold"
+              style={{ color: "rgba(255,255,255,0.5)" }}
+            >
+              Recent Students
+            </span>
+            <span className="text-xs" style={{ color: "#1E6FD9" }}>
+              View all →
+            </span>
+          </div>
+          <div>
+            {students.map((s, i) => (
+              <div
+                key={s.name}
+                className="flex items-center justify-between px-4 py-2.5"
+                style={{
+                  borderBottom:
+                    i < students.length - 1
+                      ? "1px solid rgba(255,255,255,0.04)"
+                      : "none",
+                }}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style={{
+                      background:
+                        i === 0 ? "#1E6FD9" : i === 1 ? "#7C3AED" : "#0D9488",
+                      color: "#fff",
+                    }}
+                  >
+                    {s.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p
+                      className="text-xs font-medium"
+                      style={{ color: "rgba(255,255,255,0.85)" }}
+                    >
+                      {s.name}
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: "rgba(255,255,255,0.35)" }}
+                    >
+                      {s.class}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-full font-medium"
+                    style={{
+                      background:
+                        s.status === "Present"
+                          ? "rgba(34,197,94,0.15)"
+                          : "rgba(239,68,68,0.15)",
+                      color: s.status === "Present" ? "#22C55E" : "#EF4444",
+                    }}
+                  >
+                    {s.status}
+                  </span>
+                  <span
+                    className="text-xs px-2 py-0.5 rounded-full font-medium"
+                    style={{
+                      background:
+                        s.fee === "Paid"
+                          ? "rgba(30,111,217,0.15)"
+                          : "rgba(251,191,36,0.15)",
+                      color: s.fee === "Paid" ? "#60A5FA" : "#FBBF24",
+                    }}
+                  >
+                    {s.fee}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -260,10 +488,10 @@ export default function App() {
                 key={item.label}
                 href={item.href}
                 data-ocid="nav.link"
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-semibold transition-colors ${
                   scrolled
                     ? "text-slate-700 hover:text-brand-blue"
-                    : "text-white/80 hover:text-white"
+                    : "text-white hover:text-white/70"
                 }`}
               >
                 {item.label}
@@ -275,7 +503,11 @@ export default function App() {
             <Button
               onClick={scrollToWaitlist}
               data-ocid="nav.primary_button"
-              className="bg-brand-blue hover:bg-blue-700 text-white font-semibold px-5 rounded-full"
+              className={`font-semibold px-5 rounded-full transition-all ${
+                scrolled
+                  ? "bg-brand-blue hover:bg-blue-700 text-white"
+                  : "bg-white hover:bg-white/90 text-brand-navy shadow-md"
+              }`}
             >
               Get Early Access
               <ChevronRight className="ml-1 h-4 w-4" />
@@ -339,8 +571,10 @@ export default function App() {
       </header>
 
       {/* ── Hero ── */}
-      <section className="hero-gradient min-h-screen flex items-center pt-16 pb-24 overflow-hidden">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6">
+      <section className="hero-gradient min-h-screen flex items-center pt-16 pb-24 overflow-hidden relative">
+        {/* Subtle grid overlay */}
+        <div className="hero-grid-overlay" />
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
             <motion.div
@@ -360,18 +594,7 @@ export default function App() {
                 variants={fadeUp}
                 className="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6"
               >
-                Smarter{" "}
-                <span
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #60a5fa 0%, #22c55e 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  School
-                </span>
+                Smarter <span className="hero-shimmer-text">School</span>
                 <br />
                 Management.
               </motion.h1>
@@ -422,7 +645,7 @@ export default function App() {
               </motion.div>
             </motion.div>
 
-            {/* Right: Dashboard mockup */}
+            {/* Right: Coded Dashboard mockup */}
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: 40 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -434,28 +657,46 @@ export default function App() {
               className="relative flex justify-center lg:justify-end"
             >
               <div className="relative">
+                {/* Glow behind */}
                 <div
                   className="absolute inset-0 rounded-3xl blur-3xl"
                   style={{
                     background:
-                      "radial-gradient(circle, rgba(30,111,217,0.4) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(30,111,217,0.35) 0%, transparent 70%)",
                   }}
                 />
+                {/* Outer glass frame */}
                 <div className="relative glass-card rounded-3xl overflow-hidden p-3 shadow-2xl">
-                  <img
-                    src="/assets/generated/klassapp-dashboard-mockup.dim_1200x800.png"
-                    alt="KlassApp Dashboard"
-                    className="w-full max-w-xl rounded-2xl"
-                    loading="eager"
-                  />
+                  <DashboardMockup />
                 </div>
-                <div className="absolute -bottom-5 -left-5 glass-card rounded-2xl p-3 shadow-xl">
-                  <img
-                    src="https://klassapp-logo-variations-i3t.caffeine.xyz/assets/generated/klassapp-icon.dim_512x512.png"
-                    alt="KlassApp Icon"
-                    className="h-14 w-14 rounded-xl"
-                  />
-                </div>
+                {/* Floating badge */}
+                <motion.div
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{
+                    repeat: Number.POSITIVE_INFINITY,
+                    duration: 3,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute -bottom-4 -left-4 glass-card rounded-2xl px-4 py-3 shadow-xl flex items-center gap-2.5"
+                >
+                  <div
+                    className="h-8 w-8 rounded-lg flex items-center justify-center"
+                    style={{ background: "#22C55E" }}
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white">
+                      94% Attendance
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: "rgba(255,255,255,0.5)" }}
+                    >
+                      Updated just now
+                    </p>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -463,17 +704,18 @@ export default function App() {
       </section>
 
       {/* ── Trust Bar ── */}
-      <section className="bg-brand-gray py-12">
+      <section className="bg-white py-12 border-b border-slate-100">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 text-center">
-          <p className="text-sm font-semibold text-slate-500 mb-6 tracking-widest uppercase">
+          <p className="text-xs font-bold text-slate-400 mb-7 tracking-widest uppercase">
             Trusted by schools across the country
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {SCHOOL_BADGES.map((name) => (
               <span
                 key={name}
-                className="px-4 py-2 bg-white rounded-full text-sm font-medium text-slate-700 shadow-xs border border-slate-200"
+                className="trust-badge inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-slate-600 bg-white"
               >
+                <Building2 className="h-3.5 w-3.5 text-brand-blue flex-shrink-0" />
                 {name}
               </span>
             ))}
@@ -482,7 +724,7 @@ export default function App() {
       </section>
 
       {/* ── Features ── */}
-      <section id="features" className="bg-white py-24">
+      <section id="features" className="bg-brand-gray py-24">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={staggerContainer}
@@ -493,7 +735,7 @@ export default function App() {
           >
             <motion.p
               variants={fadeUp}
-              className="text-brand-blue font-semibold text-sm tracking-widest uppercase mb-3"
+              className="text-brand-blue font-bold text-xs tracking-widest uppercase mb-3"
             >
               Features
             </motion.p>
@@ -503,9 +745,13 @@ export default function App() {
             >
               Everything your school needs.
             </motion.h2>
+            <motion.div
+              variants={fadeUp}
+              className="section-underline mx-auto mt-4 mb-5"
+            />
             <motion.p
               variants={fadeUp}
-              className="text-slate-500 text-lg mt-4 max-w-xl mx-auto"
+              className="text-slate-500 text-lg max-w-xl mx-auto"
             >
               Purpose-built tools that simplify school administration and
               empower every stakeholder.
@@ -524,10 +770,10 @@ export default function App() {
                 key={f.title}
                 variants={fadeUp}
                 data-ocid={`features.item.${i + 1}`}
-                className="feature-card bg-white border border-slate-100 rounded-2xl p-7 shadow-xs hover:shadow-md"
+                className="feature-card bg-white border border-slate-100 rounded-2xl p-7 shadow-xs hover:shadow-md group"
               >
-                <div className="h-11 w-11 rounded-xl bg-brand-blue/10 flex items-center justify-center mb-5">
-                  <f.icon className="h-5 w-5 text-brand-blue" />
+                <div className="h-11 w-11 rounded-xl feature-icon-bg flex items-center justify-center mb-5">
+                  <f.icon className="h-5 w-5 text-white" />
                 </div>
                 <h3 className="font-display text-lg font-bold text-brand-navy mb-2">
                   {f.title}
@@ -542,7 +788,7 @@ export default function App() {
       </section>
 
       {/* ── How It Works ── */}
-      <section id="how-it-works" className="bg-brand-gray py-24">
+      <section id="how-it-works" className="bg-white py-24">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={staggerContainer}
@@ -553,7 +799,7 @@ export default function App() {
           >
             <motion.p
               variants={fadeUp}
-              className="text-brand-blue font-semibold text-sm tracking-widest uppercase mb-3"
+              className="text-brand-blue font-bold text-xs tracking-widest uppercase mb-3"
             >
               How It Works
             </motion.p>
@@ -563,6 +809,10 @@ export default function App() {
             >
               Up and running in 3 steps.
             </motion.h2>
+            <motion.div
+              variants={fadeUp}
+              className="section-underline mx-auto mt-4"
+            />
           </motion.div>
 
           <motion.div
@@ -572,18 +822,21 @@ export default function App() {
             viewport={{ once: true, margin: "-80px" }}
             className="grid md:grid-cols-3 gap-8 relative"
           >
-            <div className="hidden md:block absolute top-10 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-brand-blue/20 via-brand-blue to-brand-blue/20" />
+            {/* Dashed connecting line */}
+            <div className="hidden md:block absolute top-10 left-[calc(33%+2rem)] right-[calc(33%+2rem)] border-t-2 border-dashed border-brand-blue/25" />
             {STEPS.map((step, i) => (
               <motion.div
                 key={step.num}
                 variants={fadeUp}
                 data-ocid={`steps.item.${i + 1}`}
-                className="relative text-center"
+                className="relative text-center group"
               >
-                <div className="h-20 w-20 rounded-2xl bg-brand-blue flex items-center justify-center mx-auto mb-6 shadow-blue">
-                  <span className="font-display text-2xl font-extrabold text-white">
+                {/* Large outlined number */}
+                <div className="relative h-24 w-24 mx-auto mb-6 flex items-center justify-center">
+                  <span className="step-number-outline font-display font-extrabold">
                     {step.num}
                   </span>
+                  <div className="absolute inset-0 rounded-full border-2 border-dashed border-brand-blue/20 group-hover:border-brand-blue/40 transition-colors" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-brand-navy mb-3">
                   {step.title}
@@ -598,7 +851,7 @@ export default function App() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section className="bg-white py-24">
+      <section className="bg-brand-gray py-24">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={staggerContainer}
@@ -609,7 +862,7 @@ export default function App() {
           >
             <motion.p
               variants={fadeUp}
-              className="text-brand-blue font-semibold text-sm tracking-widest uppercase mb-3"
+              className="text-brand-blue font-bold text-xs tracking-widest uppercase mb-3"
             >
               Testimonials
             </motion.p>
@@ -619,6 +872,10 @@ export default function App() {
             >
               Loved by educators.
             </motion.h2>
+            <motion.div
+              variants={fadeUp}
+              className="section-underline mx-auto mt-4"
+            />
           </motion.div>
 
           <motion.div
@@ -633,11 +890,11 @@ export default function App() {
                 key={t.name}
                 variants={fadeUp}
                 data-ocid={`testimonials.item.${i + 1}`}
-                className="bg-brand-gray rounded-2xl p-8 relative overflow-hidden"
+                className="testimonial-card bg-white rounded-2xl p-8 relative overflow-hidden shadow-xs"
               >
                 <div
                   className="absolute top-5 right-6 font-display text-7xl font-extrabold leading-none select-none"
-                  style={{ color: "#1E6FD9", opacity: 0.12 }}
+                  style={{ color: "#1E6FD9", opacity: 0.08 }}
                 >
                   &ldquo;
                 </div>
@@ -649,20 +906,22 @@ export default function App() {
                     />
                   ))}
                 </div>
-                <p className="text-slate-700 text-sm leading-relaxed mb-6 relative z-10">
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 relative z-10">
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-brand-blue flex items-center justify-center flex-shrink-0">
+                  <div
+                    className={`h-10 w-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center flex-shrink-0`}
+                  >
                     <span className="text-white font-bold text-sm">
-                      {t.name.charAt(0)}
+                      {t.initials}
                     </span>
                   </div>
                   <div>
                     <p className="font-semibold text-brand-navy text-sm">
                       {t.name}
                     </p>
-                    <p className="text-slate-500 text-xs">{t.role}</p>
+                    <p className="text-slate-400 text-xs">{t.role}</p>
                   </div>
                 </div>
               </motion.div>
@@ -672,7 +931,7 @@ export default function App() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="bg-brand-gray py-24">
+      <section id="pricing" className="bg-white py-24">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6">
           <motion.div
             variants={staggerContainer}
@@ -683,7 +942,7 @@ export default function App() {
           >
             <motion.p
               variants={fadeUp}
-              className="text-brand-blue font-semibold text-sm tracking-widest uppercase mb-3"
+              className="text-brand-blue font-bold text-xs tracking-widest uppercase mb-3"
             >
               Pricing
             </motion.p>
@@ -693,7 +952,11 @@ export default function App() {
             >
               Simple, transparent pricing.
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-slate-500 text-lg mt-4">
+            <motion.div
+              variants={fadeUp}
+              className="section-underline mx-auto mt-4 mb-5"
+            />
+            <motion.p variants={fadeUp} className="text-slate-500 text-lg">
               No hidden fees. Cancel anytime.
             </motion.p>
           </motion.div>
@@ -713,7 +976,7 @@ export default function App() {
                 className={`relative bg-white rounded-2xl p-8 ${
                   plan.highlight
                     ? "pricing-highlight -mt-4 pt-12 pb-12"
-                    : "shadow-xs"
+                    : "border border-slate-100 shadow-xs"
                 }`}
               >
                 {plan.popular && (
@@ -769,12 +1032,11 @@ export default function App() {
       <section
         ref={waitlistRef as React.RefObject<HTMLElement>}
         id="waitlist"
-        className="py-24"
-        style={{
-          background: "linear-gradient(135deg, #0f172a 0%, #1a2d4f 100%)",
-        }}
+        className="waitlist-section py-24 relative overflow-hidden"
       >
-        <div className="container max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        {/* Grid texture overlay */}
+        <div className="waitlist-grid-overlay" />
+        <div className="container max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
