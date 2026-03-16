@@ -216,16 +216,72 @@ function DashboardMockup() {
 
   const handleDownload = async () => {
     if (!mockupRef.current) return;
-    const html2canvas = (await import("html2canvas")).default;
-    const canvas = await html2canvas(mockupRef.current, {
-      backgroundColor: "#0d1b35",
-      scale: 2,
-      useCORS: true,
-    });
-    const link = document.createElement("a");
-    link.download = "klassapp-dashboard.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
+    const el = mockupRef.current;
+    const rect = el.getBoundingClientRect();
+    const scale = 2;
+    const w = rect.width;
+    const h = rect.height;
+
+    // Clone and inline all computed styles so SVG foreignObject renders correctly
+    function inlineComputedStyles(source: Element, target: Element) {
+      const computed = window.getComputedStyle(source);
+      let css = "";
+      for (let i = 0; i < computed.length; i++) {
+        const prop = computed[i];
+        css += `${prop}:${computed.getPropertyValue(prop)};`;
+      }
+      (target as HTMLElement).style.cssText = css;
+      for (let i = 0; i < source.children.length; i++) {
+        inlineComputedStyles(source.children[i], target.children[i]);
+      }
+    }
+
+    const clone = el.cloneNode(true) as HTMLElement;
+    inlineComputedStyles(el, clone);
+    clone.style.width = `${w}px`;
+    clone.style.height = `${h}px`;
+    clone.style.transform = "none";
+    clone.style.borderRadius = "0";
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.setAttribute("xmlns:xhtml", "http://www.w3.org/1999/xhtml");
+    svg.setAttribute("width", String(w * scale));
+    svg.setAttribute("height", String(h * scale));
+
+    const fo = document.createElementNS(svgNS, "foreignObject");
+    fo.setAttribute("x", "0");
+    fo.setAttribute("y", "0");
+    fo.setAttribute("width", String(w));
+    fo.setAttribute("height", String(h));
+    fo.setAttribute("transform", `scale(${scale})`);
+    fo.appendChild(clone);
+    svg.appendChild(fo);
+
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svg);
+    const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(w * scale);
+    canvas.height = Math.round(h * scale);
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#0d1b35";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const link = document.createElement("a");
+      link.download = "klassapp-dashboard.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    };
+    img.onerror = () => URL.revokeObjectURL(url);
+    img.src = url;
   };
 
   const students = [
